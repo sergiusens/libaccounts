@@ -39,8 +39,7 @@ Here's an example of usage:
         auth := ac[i].GetAuthData()
         defer auth.Delete()
         fmt.Println(svc)
-        if auth.LoginParameters.ClientSecret != "" {
-            fmt.Println("Client Secret:", auth.LoginParameters.ClientSecret)
-        }
+        fmt.Println("Auth data :", auth)
+        fmt.Println()
 	}
 

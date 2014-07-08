@@ -58,6 +58,9 @@ func NewAuthData(acc *AccountService) *AuthData {
 	auth := C.ag_account_service_get_auth_data(acc.acc)
 	return &AuthData{
 		auth:            auth,
+		Id:              getId(auth),
+		Mechanism:       getMechanism(auth),
+		Method:          getMethod(auth),
 		LoginParameters: getParameters(auth),
 	}
 }
@@ -65,6 +68,35 @@ func NewAuthData(acc *AccountService) *AuthData {
 // Delete removes the AgAuthData instance.
 func (auth *AuthData) Delete() {
 	C.ag_auth_data_unref(C.to_AgAuthData(unsafe.Pointer(auth.auth)))
+}
+
+func (auth *AuthData) String() string {
+	return fmt.Sprintf(
+		"Id: '%d' | Mechanism: '%s', Method: '%s' | Login Parameters: {'%s'}",
+		auth.Id, auth.Mechanism, auth.Method, auth.LoginParameters.String(),
+	)
+}
+
+func (loginParam *AuthLoginParameters) String() string {
+	return fmt.Sprintf(
+		"ClientId: '%s' | ClientSecret: '%s' | ConsumerKey: '%s' | ConsumerSecret: '%s'",
+		loginParam.ClientId,
+		loginParam.ClientSecret,
+		loginParam.ConsumerKey,
+		loginParam.ConsumerSecret,
+	)
+}
+
+func getId(auth *C.AgAuthData) uint {
+	return uint(C.ag_auth_data_get_credentials_id(auth))
+}
+
+func getMechanism(auth *C.AgAuthData) string {
+	return getStringFromGCharPtr(C.ag_auth_data_get_mechanism(auth))
+}
+
+func getMethod(auth *C.AgAuthData) string {
+	return getStringFromGCharPtr(C.ag_auth_data_get_method(auth))
 }
 
 func getParameters(auth *C.AgAuthData) *AuthLoginParameters {
